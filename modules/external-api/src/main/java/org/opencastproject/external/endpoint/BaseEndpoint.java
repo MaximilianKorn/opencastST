@@ -47,8 +47,10 @@ import com.entwinemedia.fn.data.json.JString;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openapitools.client.model.ApiInfoMe;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +65,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+
+
 
 /**
  * The external service endpoint acts as a location for external apis to query the current server of the external
@@ -133,6 +138,23 @@ public class BaseEndpoint {
             f("provider", v(user.getProvider())), f("userrole", v(getUserIdRole(user.getUsername()))),
             f("username", v(user.getUsername())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
+  }
+
+  @GET
+  @Path("info/meST")
+  @RestQuery(name = "getuserinfoST", description = "Returns information on the logged in user.", returnDescription = "", responses = {
+          @RestResponse(description = "The user information is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getUserInfoST() {
+    final User user = securityService.getUser();
+    ApiInfoMe meJson = new ApiInfoMe();
+    meJson.setEmail(user.getEmail());
+    meJson.setName(user.getName());
+    meJson.setProvider(user.getProvider());
+    meJson.setUserrole(getUserIdRole(user.getUsername()));
+    meJson.setUsername(user.getUsername());
+    String json = new Gson().toJson(meJson);
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
   }
 
   @GET
