@@ -1,0 +1,702 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Opencast",
+    "description": "This is the external API for opencast.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api": {
+      "get": {
+        "tags": [
+          "base"
+        ],
+        "description": "In order to assess key characteristics of the External API and to test general connectivity, the External API’s root url is not protected through authentication.",
+        "responses": {
+          "200": {
+            "description": "Returns key characteristics of the External API such as the API base URL and the default version.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api"
+                  }
+                },
+                "example": {
+                  "url": "https://api.opencast.org/api",
+                  "version": "v1.0.1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/info/me": {
+      "get": {
+        "description": "Returns information on the logged in user.",
+        "responses": {
+          "200": {
+            "description": "The user information is returned as a JSON object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-info-me"
+                  }
+                },
+                "example": {
+                  "provider": "opencast",
+                  "name": "Opencast Student",
+                  "userrole": "ROLE_USER_92623987_OPENCAST_ORG",
+                  "email": "nowhere@opencast.org",
+                  "username": "92623987@opencast.org"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/info/me/roles": {
+      "get": {
+        "description": "Returns current user's roles.",
+        "responses": {
+          "200": {
+            "description": "Returns current user's roles as an array of strings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "example": [
+                  "ROLE_USER_92623987@opencast.org",
+                  "ROLE_STUDENT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/info/organization": {
+      "get": {
+        "description": "Returns the current organization.",
+        "responses": {
+          "200": {
+            "description": "The organization details are returned as JSON object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-info-organization"
+                  }
+                },
+                "example": {
+                  "adminRole": "ROLE_ADMIN",
+                  "anonymousRole": "ROLE_ANONYMOUS",
+                  "id": "mh_default_org",
+                  "name": "Opencast"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/info/organization/properties": {
+      "get": {
+        "description": "Returns the current organization's properties. The set of properties is a key-value set that depends on the configuration of Opencast.",
+        "responses": {
+          "200": {
+            "description": "The organization properties are returned as property.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "org.opencastproject.feed.url": "http://feeds.opencast.org",
+                  "org.opencastproject.admin.documentation.url": "http://documentation.opencast.org",
+                  "org.opencastproject.external.api.url": "http://api.opencast.org"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/version": {
+      "get": {
+        "description": "Returns a list of available version as well as the default version.",
+        "responses": {
+          "200": {
+            "description": "The version information is returned as JSON object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-version"
+                  }
+                },
+                "example": {
+                  "versions": [
+                    "v1.0.0",
+                    "v1.1.0"
+                  ],
+                  "default": "v1.1.0"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/version/default": {
+      "get": {
+        "description": "Returns the default version.",
+        "responses": {
+          "200": {
+            "description": "The default version is returned as JSON object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-version-default"
+                  }
+                },
+                "example": {
+                  "default-version": {
+                    "default": "v1.1.0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/series": {
+      "get": {
+        "description": "Returns a list of series.",
+        "responses": {
+          "200": {
+			"description": "A (potentially empty) list of series is returned as JSON array contained JSON objects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-series"
+                  }
+                },
+                "example": {
+                  "series-list": [
+                    {
+                      "identifier": "dc11ab0a-fd5b-462d-a939-0a4703df38cf",
+                      "creator": "Opencast Project Administrator",
+                      "created": "2018-03-19T15:40:21Z",
+                      "subjects": [
+                        "Mathematics"
+                      ],
+                      "organizers": [
+                        "John Doe",
+                        "Prof. X"
+                      ],
+                      "publishers": [
+                        "University of Prof. X"
+                      ],
+                      "contributors": [
+                        "Hans Muster",
+                        "Maria Müller"
+                      ],
+                      "title": "Advanced Mathematics"
+                    },
+                    {
+                      "identifier": "6a4462ca-3783-432a-81c3-962ca756dc6f",
+                      "creator": "Opencast Project Administrator",
+                      "created": "2018-03-19T15:41:20Z",
+                      "subjects": [
+                        "Physics",
+                        "Mathematics"
+                      ],
+                      "organizers": [
+                        "Dr. Who"
+                      ],
+                      "publishers": [
+                        "University of Prof. X",
+                        "Doctor Who"
+                      ],
+                      "contributors": [
+                        "Dr. Who"
+                      ],
+                      "title": "Basics of Physics"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a series.",
+        "responses": {
+          "201": {
+            "description": "A new series is created and its identifier is returned in the Location header.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-series-post"
+                  }
+                },
+                "example": {
+                  "identifier": {
+                    "identifier": "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is invalid or inconsistent."
+          },
+          "401": {
+            "description": "The user doesn't have the rights to create the series."
+          }
+        }
+      }
+    },
+    "/api/series/{series_id}": {
+      "get": {
+        "description": "Returns a single series.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The series is returned as a JSON object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-series"
+                  }
+                },
+                "example": {
+                  "default-version": {
+                    "identifier": "dc11ab0a-fd5b-462d-a939-0a4703df38cf",
+                    "creator": "Opencast Project Administrator",
+                    "opt_out": false,
+                    "created": "2018-03-19T15:40:21Z",
+                    "subjects": [
+                      "Mathematics"
+                    ],
+                    "organization": "mh_default_org",
+                    "organizers": [
+                      "John Doe",
+                      "Prof. X"
+                    ],
+                    "description": "This is a advanced mathematics course",
+                    "publishers": [
+                      "University of Prof. X"
+                    ],
+                    "contributors": [
+                      "Hans Muster",
+                      "Maria Müller"
+                    ],
+                    "title": "Advanced Mathematics"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      },
+      "delete": {
+        "description": "Deletes a series.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The series has been deleted."
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      }
+    },
+    "/api/series/{series_id}/metadata": {
+      "get": {
+        "description": "Returns a series' metadata of all types.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The series' metadata are returned as catalogs"
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      },
+      "put": {
+        "description": "Update a series' metadata of the given type.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The series' metadata have been updated."
+          },
+          "400": {
+            "description": "The request is invalid or inconsistent."
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      },
+      "delete": {
+        "description": "Deletes a series' metadata catalog of the given type. All fields and values of that catalog will be deleted.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The metadata have been deleted."
+          },
+          "403": {
+            "description": "The main metadata catalog dublincore/series cannot be deleted as it has mandatory fields."
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      }
+    },
+    "/api/series/{series_id}/acl": {
+      "get": {
+        "description": "Returns a series' access policy.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The series' access policy of type acl is returned."
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      },
+      "put": {
+        "description": "Update a series' metadata of the given type.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The updated access control list of type acl is returned."
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      }
+    },
+    "/api/series/{series_id}/properties": {
+      "get": {
+        "description": "Returns a series' properties.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The series' properties are returned as property."
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      },
+      "put": {
+        "description": "Add or update properties of a series.",
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The added/updated series' properties are returned as JSON object."
+          },
+          "404": {
+            "description": "The specified series does not exist."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "api": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "Default version of the External API"
+          },
+          "url": {
+            "type": "string",
+            "description": "Base URL clients shall use to communicate with the External API"
+          }
+        }
+      },
+      "api-info-me": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "The Opencast user provider that manages this user"
+          },
+          "name": {
+            "type": "string",
+            "description": "Displayable name of the user"
+          },
+          "username": {
+            "type": "string",
+            "description": "The username"
+          },
+          "userrole": {
+            "type": "string",
+            "description": "The role uniquly identifying the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "The e-mail address of the user"
+          }
+        }
+      },
+      "api-info-organization": {
+        "properties": {
+          "adminRole": {
+            "type": "string",
+            "description": "The role administrator users have"
+          },
+          "anonymousRole": {
+            "type": "string",
+            "description": "The role unauthenticated users have"
+          },
+          "id": {
+            "type": "string",
+            "description": "The tenant identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "The tenant name"
+          }
+        }
+      },
+      "api-version": {
+        "properties": {
+          "versions": {
+            "type": "array",
+            "description": "All External API versions supported by this server",
+            "items": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "type": "string",
+            "description": "The default External API version used by this server"
+          }
+        }
+      },
+      "api-version-default": {
+        "properties": {
+          "default": {
+            "type": "string",
+            "description": "The default External API version used by this server"
+          }
+        }
+      },
+      "api-series": {
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "The unique identifier of the series"
+          },
+          "created": {
+            "type": "string",
+            "description": "The data when the series was created",
+            "format": "date-time"
+          },
+          "creator": {
+            "type": "string",
+            "description": "The name of the user that has created the series"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the series"
+          },
+          "contributors": {
+            "type": "array",
+            "description": "The contributors of the series",
+            "items": {
+              "type": "string"
+            }
+          },
+          "publishers": {
+            "type": "array",
+            "description": "The publishers of the series",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subjects": {
+            "type": "array",
+            "description": "The subjects of the series",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organizers": {
+            "type": "array",
+            "description": "The organizers of the series",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the series (version 1.1.0 and higher)"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the series (version 1.1.0 and higher)"
+          },
+          "license": {
+            "type": "string",
+            "description": "The license of the series (version 1.1.0 and higher)"
+          },
+          "rightsholder": {
+            "type": "string",
+            "description": "The rights holder of the series (version 1.1.0 and higher)"
+          }
+        }
+      },
+      "api-series-post": {
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "The unique identifier of the series"
+          }
+        }
+      }
+    }
+  }
+}
