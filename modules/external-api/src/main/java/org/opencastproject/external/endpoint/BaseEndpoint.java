@@ -50,12 +50,16 @@ import com.entwinemedia.fn.data.json.SimpleSerializer;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openapitools.client.model.Api;
 import org.openapitools.client.model.ApiInfoMe;
+import org.openapitools.client.model.ApiInfoOrganization;
+import org.openapitools.client.model.ApiVersionDefault;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -128,6 +132,28 @@ public class BaseEndpoint {
   }
 
   @GET
+  @Path("ST")
+  @RestQuery(name = "getendpointinfoST", description = "Returns key characteristics of the API such as the server name and the default version.", returnDescription = "", responses = {
+          @RestResponse(description = "The api information is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getEndpointInfoST() {
+    Organization organization = securityService.getOrganization();
+    String orgExternalAPIUrl = organization.getProperties().get(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
+
+    String url;
+    if (StringUtils.isNotBlank(orgExternalAPIUrl)) {
+      url = orgExternalAPIUrl;
+    } else {
+      url = endpointBaseUrl;
+    }
+
+    Api apiJson = new Api();
+    apiJson.setVersion(ApiVersion.CURRENT_VERSION.toString());
+    apiJson.setUrl(url);
+    String json = new Gson().toJson(apiJson);
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
+  }
+
+  @GET
   @Path("info/me")
   @RestQuery(name = "getuserinfo", description = "Returns information on the logged in user.", returnDescription = "", responses = {
           @RestResponse(description = "The user information is returned.", responseCode = HttpServletResponse.SC_OK) })
@@ -173,6 +199,22 @@ public class BaseEndpoint {
   }
 
   @GET
+  @Path("info/me/rolesST")
+  @RestQuery(name = "getuserrolesST", description = "Returns current user's roles.", returnDescription = "", responses = {
+          @RestResponse(description = "The set of roles is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getUserRolesST() {
+    final User user = securityService.getUser();
+
+    List<String> roles = new ArrayList<>();
+    for (final Role role : user.getRoles()) {
+      roles.add(role.getName());
+    }
+    String json = new Gson().toJson(roles);
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
+  }
+
+  @GET
   @Path("info/organization")
   @RestQuery(name = "getorganizationinfo", description = "Returns the current organization.", returnDescription = "", responses = {
           @RestResponse(description = "The organization details are returned.", responseCode = HttpServletResponse.SC_OK) })
@@ -183,6 +225,22 @@ public class BaseEndpoint {
             f("id", v(org.getId())), f("name", v(org.getName())));
 
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
+  }
+
+  @GET
+  @Path("info/organizationST")
+  @RestQuery(name = "getorganizationinfoST", description = "Returns the current organization.", returnDescription = "", responses = {
+          @RestResponse(description = "The organization details are returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getOrganizationInfoST() {
+    final Organization org = securityService.getOrganization();
+    ApiInfoOrganization organizationJson = new ApiInfoOrganization();
+    organizationJson.setAdminRole(org.getAdminRole());
+    organizationJson.setAnonymousRole(org.getAnonymousRole());
+    organizationJson.setId(org.getId());
+    organizationJson.setName(org.getName());
+    String json = new Gson().toJson(organizationJson);
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
   }
 
   @GET
@@ -198,6 +256,22 @@ public class BaseEndpoint {
     }
 
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(obj(props)));
+  }
+
+  @GET
+  @Path("info/organization/propertiesST")
+  @RestQuery(name = "getorganizationpropertiesST", description = "Returns the current organization's properties.", returnDescription = "", responses = {
+          @RestResponse(description = "The organization properties are returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getOrganizationPropertiesST() {
+    final Organization org = securityService.getOrganization();
+
+    HashMap<String, String> props = new HashMap<String, String>();
+    for (Entry<String, String> prop : org.getProperties().entrySet()) {
+      props.put(prop.getKey(), prop.getValue());
+    }
+    String json = new Gson().toJson(props);
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
   }
 
   @GET
@@ -222,6 +296,27 @@ public class BaseEndpoint {
   }
 
   @GET
+  @Path("info/organization/properties/engageuiurlST")
+  @RestQuery(name = "getorganizationpropertiesengageuiurlST", description = "Returns the engage ui url property.", returnDescription = "", responses = {
+          @RestResponse(description = "The engage ui url is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getOrganizationPropertiesEngageUiUrlST() {
+    final Organization org = securityService.getOrganization();
+    HashMap<String, String> props = new HashMap<String, String>();
+    for (Entry<String, String> prop : org.getProperties().entrySet()) {
+      if (prop.getKey().equals("org.opencastproject.engage.ui.url")) {
+        props.put(prop.getKey(), prop.getValue());
+        break;
+      }
+    }
+    if (props.size() == 0) {
+      props.put("org.opencastproject.engage.ui.url", UrlSupport.DEFAULT_BASE_URL);
+    }
+    String json = new Gson().toJson(props);
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
+  }
+
+  @GET
   @Path("version")
   @RestQuery(name = "getversion", description = "Returns a list of available version as well as the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
@@ -240,12 +335,44 @@ public class BaseEndpoint {
   }
 
   @GET
+  @Path("versionST")
+  @RestQuery(name = "getversionST", description = "Returns a list of available version as well as the default version.", returnDescription = "", responses = {
+          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getVersionST() throws Exception {
+    org.openapitools.client.model.ApiVersion versionsJson = new org.openapitools.client.model.ApiVersion();
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_0_0.toString());
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_1_0.toString());
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_2_0.toString());
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_3_0.toString());
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_4_0.toString());
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_5_0.toString());
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_6_0.toString());
+    versionsJson.addVersionsItem(ApiVersion.VERSION_1_7_0.toString());
+    versionsJson.setDefault(ApiVersion.CURRENT_VERSION.toString());
+    String json = new Gson().toJson(versionsJson);
+
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
+  }
+
+  @GET
   @Path("version/default")
   @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersionDefault() throws Exception {
     JValue json = obj(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
+  }
+
+  @GET
+  @Path("version/defaultST")
+  @RestQuery(name = "getversiondefaultST", description = "Returns the default version.", returnDescription = "", responses = {
+          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getVersionDefaultST() throws Exception {
+    ApiVersionDefault versionDefaultJson = new ApiVersionDefault();
+    versionDefaultJson.setDefault(ApiVersion.CURRENT_VERSION.toString());
+    String json = new Gson().toJson(versionDefaultJson);
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, json);
   }
 
 }

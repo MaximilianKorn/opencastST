@@ -140,6 +140,29 @@
         }
       }
     },
+    "/api/info/organization/properties/engageuiurl": {
+      "get": {
+        "description": "Returns the engage ui url property.",
+        "responses": {
+          "200": {
+            "description": "The engage ui url is returned as a JSON object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api-info-organization-engageuiurl"
+                  }
+                },
+                "example": {
+                  "org.opencastproject.engage.ui.url": "http://www.opencast.org"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/version": {
       "get": {
         "description": "Returns a list of available version as well as the default version.",
@@ -598,6 +621,14 @@
           "name": {
             "type": "string",
             "description": "The tenant name"
+          }
+        }
+      },
+      "api-info-organization-engageuiurl": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The engage ui url"
           }
         }
       },
