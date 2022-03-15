@@ -73,6 +73,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -316,8 +317,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (offset != 0) {
       return;
     }
-    final Opt<Series> series = indexService.getSeries(resourceId, index);
-    if (!series.isSome()) {
+    final Optional<Series> series = indexService.getSeries(resourceId, index);
+    if (!series.isPresent()) {
       throw new NotFoundException("Series not found in index: " + resourceId);
     }
     final TimeSeries dataSeries = statisticsService.getTimeSeriesData(
